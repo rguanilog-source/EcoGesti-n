@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GestioResiduos - Plataforma de Gestión de Residuos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navegación -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">♻️ GestioResiduos</div>
+            <ul class="nav-menu">
+                <li><a href="#" onclick="showSection('dashboard')">Dashboard</a></li>
+                <li><a href="#" onclick="showSection('registro')">Registrar Residuos</a></li>
+                <li><a href="#" onclick="showSection('historial')">Historial</a></li>
+                <li><a href="#" onclick="showSection('empresas')">Empresas</a></li>
+                <li><a href="#" onclick="showSection('reportes')">Reportes</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="section active">
+            <div class="header-section">
+                <h1>Dashboard de Gestión de Residuos</h1>
+                <p>Resumen general de la plataforma</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <h3>Total de Residuos</h3>
+                        <p class="stat-value" id="totalResiduos">0 kg</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-content">
+                        <h3>Registros</h3>
+                        <p class="stat-value" id="totalRegistros">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">♻️</div>
+                    <div class="stat-content">
+                        <h3>Empresas Asociadas</h3>
+                        <p class="stat-value" id="totalEmpresas">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-content">
+                        <h3>Residuos Reutilizados</h3>
+                        <p class="stat-value" id="residuosReutilizados">0 kg</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h2>Residuos por Categoría</h2>
+                    <canvas id="chartCategoria"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <h2>Tendencia Semanal</h2>
+                    <canvas id="chartTendencia"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- REGISTRO DE RESIDUOS -->
+        <section id="registro" class="section">
+            <div class="header-section">
+                <h1>Registrar Nuevos Residuos</h1>
+                <p>Ingresa información sobre residuos generados</p>
+            </div>
+
+            <div class="form-container">
+                <form id="formRegistroResiduos">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mercado">Mercado/Negocio:</label>
+                            <input type="text" id="mercado" placeholder="Nombre del mercado o negocio" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipoMercado">Tipo de Mercado:</label>
+                            <select id="tipoMercado" required>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="estatal">Estatal</option>
+                                <option value="privado">Privado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoria">Categoría de Residuo:</label>
+                            <select id="categoria" onchange="actualizarTipos()" required>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="organico">Orgánico</option>
+                                <option value="plastico">Plástico</option>
+                                <option value="metal">Metal</option>
+                                <option value="vidrio">Vidrio</option>
+                                <option value="papel">Papel/Cartón</option>
+                                <option value="textil">Textil</option>
+                                <option value="peligroso">Peligroso</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo">Tipo Específico:</label>
+                            <select id="tipo" required>
+                                <option value="">-- Seleccionar tipo --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cantidad">Cantidad (kg):</label>
+                            <input type="number" id="cantidad" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fecha">Fecha de Registro:</label>
+                            <input type="date" id="fecha" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="descripcion">Descripción (opcional):</label>
+                            <textarea id="descripcion" placeholder="Detalles adicionales sobre los residuos" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">📝 Registrar Residuos</button>
+                        <button type="reset" class="btn btn-secondary">🔄 Limpiar Formulario</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="mensajeRegistro" class="mensaje"></div>
+        </section>
+
+        <!-- HISTORIAL DE REGISTROS -->
+        <section id="historial" class="section">
+            <div class="header-section">
+                <h1>Historial de Registros</h1>
+                <p>Todos los residuos registrados en la plataforma</p>
+            </div>
+
+            <div class="filtros-container">
+                <input type="text" id="filtroMercado" placeholder="Filtrar por mercado..." class="filtro-input">
+                <select id="filtroCategoria" class="filtro-input">
+                    <option value="">Todas las categorías</option>
+                    <option value="organico">Orgánico</option>
+                    <option value="plastico">Plástico</option>
+                    <option value="metal">Metal</option>
+                    <option value="vidrio">Vidrio</option>
+                    <option value="papel">Papel/Cartón</option>
+                    <option value="textil">Textil</option>
+                    <option value="peligroso">Peligroso</option>
+                </select>
+                <button class="btn btn-primary" onclick="aplicarFiltros()">🔍 Filtrar</button>
+                <button class="btn btn-secondary" onclick="limpiarFiltros()">🔄 Limpiar</button>
+            </div>
+
+            <div class="table-responsive">
+                <table id="tablaHistorial" class="tabla-datos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Mercado</th>
+                            <th>Tipo Mercado</th>
+                            <th>Categoría</th>
+                            <th>Tipo</th>
+                            <th>Cantidad (kg)</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla">
+                        <tr>
+                            <td colspan="8" class="sin-datos">No hay registros. ¡Comienza a registrar residuos!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- EMPRESAS ESPECIALIZADAS -->
+        <section id="empresas" class="section">
+            <div class="header-section">
+                <h1>Empresas Especializadas en Reutilización</h1>
+                <p>Directorio de empresas para aprovechamiento de residuos</p>
+            </div>
+
+            <div class="empresa-formulario">
+                <h2>Agregar Nueva Empresa</h2>
+                <form id="formAgregarEmpresa">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombreEmpresa">Nombre de Empresa:</label>
+                            <input type="text" id="nombreEmpresa" placeholder="Nombre empresa" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="especializacion">Especialización:</label>
+                            <select id="especializacion" required>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="organico">Orgánico</option>
+                                <option value="plastico">Plástico</option>
+                                <option value="metal">Metal</option>
+                                <option value="vidrio">Vidrio</option>
+                                <option value="papel">Papel/Cartón</option>
+                                <option value="textil">Textil</option>
+                                <option value="multiple">Múltiples Categorías</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="telefonoEmpresa">Teléfono:</label>
+                            <input type="tel" id="telefonoEmpresa" placeholder="+1234567890" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emailEmpresa">Email:</label>
+                            <input type="email" id="emailEmpresa" placeholder="empresa@ejemplo.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="ubicacionEmpresa">Ubicación:</label>
+                            <input type="text" id="ubicacionEmpresa" placeholder="Dirección o ubicación" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="descripcionEmpresa">Descripción de Servicios:</label>
+                            <textarea id="descripcionEmpresa" placeholder="Detalla los servicios ofrecidos" rows="4" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">➕ Agregar Empresa</button>
+                        <button type="reset" class="btn btn-secondary">🔄 Limpiar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="mensajeEmpresa" class="mensaje"></div>
+
+            <h2 style="margin-top: 40px;">Empresas Registradas</h2>
+            <div class="empresas-grid" id="empresasGrid">
+                <p class="sin-datos">No hay empresas registradas aún.</p>
+            </div>
+        </section>
+
+        <!-- REPORTES -->
+        <section id="reportes" class="section">
+            <div class="header-section">
+                <h1>Reportes y Estadísticas</h1>
+                <p>Análisis detallado de residuos generados</p>
+            </div>
+
+            <div class="reportes-opciones">
+                <button class="btn btn-primary" onclick="generarReporteGeneral()">📊 Reporte General</button>
+                <button class="btn btn-primary" onclick="generarReporteCategoria()">📋 Por Categoría</button>
+                <button class="btn btn-primary" onclick="generarReporteMercado()">🏢 Por Mercado</button>
+                <button class="btn btn-primary" onclick="descargarExcel()">📥 Descargar Excel</button>
+            </div>
+
+            <div id="contenidoReporte" class="reporte-contenido">
+                <p>Selecciona una opción de reporte para visualizar los resultados.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal para editar -->
+    <div id="modalEditar" class="modal">
+        <div class="modal-contenido">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2>Editar Registro</h2>
+            <form id="formEditar">
+                <div class="form-group">
+                    <label for="editMercado">Mercado:</label>
+                    <input type="text" id="editMercado" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCantidad">Cantidad (kg):</label>
+                    <input type="number" id="editCantidad" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategoria">Categoría:</label>
+                    <select id="editCategoria" required>
+                        <option value="">-- Seleccionar --</option>
+                        <option value="organico">Orgánico</option>
+                        <option value="plastico">Plástico</option>
+                        <option value="metal">Metal</option>
+                        <option value="vidrio">Vidrio</option>
+                        <option value="papel">Papel/Cartón</option>
+                        <option value="textil">Textil</option>
+                        <option value="peligroso">Peligroso</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
